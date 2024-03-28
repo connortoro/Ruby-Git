@@ -43,6 +43,30 @@ when "hash-object"
     raise "i dont know that one!"
   end
 
+when "ls-tree"
+  if ARGV[1] == "--name-only"
+    tree_sha = ARGV[2]
+    tree_path = ".git/objects/#{tree_sha[0..1]}/#{tree_sha[2..]}"
+    compressed_contents = File.read(tree_path, mode:"rb")
+
+    inflater = Zlib::Inflate.new
+    content = inflater.inflate(compressed_contents)
+    inflater.finish
+
+    content = content[(content.index("\0") + 1)..]
+    while(true)
+      space_idx = content.index(" ")
+      null_idx = content.index("\0")
+      break if space_idx.nil? or null_idx.nil?
+
+      puts(content[(space_idx+1)..(null_idx-1)])
+      content = content[(null_idx+1)..]
+    end
+
+  else
+    raise "i dont know"
+  end
+
 else
   raise RuntimeError.new("Unknown command #{command}")
 end
