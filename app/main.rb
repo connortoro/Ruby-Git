@@ -71,7 +71,7 @@ when "hash-object"
     print write_object(file, "blob")
 
   else
-    raise "i dont even know that one!"
+    raise "i dont even know that one !"
   end
 
 when "write-tree"
@@ -100,6 +100,20 @@ when "ls-tree"
   else
     raise "i dont know!"
   end
+
+when "commit-tree"
+  commit = "tree #{ARGV[1]}\n"
+  msg = ""
+  if ARGV[2] == "-m"
+    msg = ARGV[3]
+  else
+    commit += "parent #{ARGV[3]}"
+    msg = ARGV[5]
+  end
+  commit += "author connor <connoro.toro@gmail.com> #{Time.now.to_i}\n"
+  commit += "committer connor <connoro.toro@gmail.com> #{Time.now.to_i}\n\n"
+  commit += "#{msg}\n"
+  print write_object(commit, "commit")
 else
   raise RuntimeError.new("Unknown command #{command}")
 end
